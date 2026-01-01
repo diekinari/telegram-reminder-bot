@@ -1,4 +1,4 @@
-/a# Telegram Reminder Bot
+# Telegram Reminder Bot
 
 Telegram-bot for task reminders with deadlines, importance levels, and reminder frequency.
 
