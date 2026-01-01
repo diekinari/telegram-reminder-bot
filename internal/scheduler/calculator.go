@@ -20,10 +20,11 @@ func CalculateReminderTimes(importance int, workStartHour, workEndHour int, now 
 
 	times := make([]time.Time, importance)
 	duration := workEnd.Sub(workStart)
-	interval := duration / time.Duration(importance-1)
+	interval := duration / time.Duration(importance)
 
+	// Делим день на равные слоты и ставим напоминание в середине каждого слота
 	for i := 0; i < importance; i++ {
-		times[i] = workStart.Add(interval * time.Duration(i))
+		times[i] = workStart.Add(interval/2 + interval*time.Duration(i))
 	}
 
 	return times

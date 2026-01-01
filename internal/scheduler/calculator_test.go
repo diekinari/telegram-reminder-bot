@@ -70,22 +70,30 @@ func TestCalculateReminderTimes_Distribution(t *testing.T) {
 		}
 	})
 
-	t.Run("importance 5 should span work hours", func(t *testing.T) {
+	t.Run("importance 5 should be within work hours", func(t *testing.T) {
 		times := CalculateReminderTimes(5, 9, 18, now)
 		if len(times) != 5 {
 			t.Fatalf("expected 5 times, got %d", len(times))
 		}
 
-		// First should be at work start
-		expectedFirst := time.Date(2024, 1, 15, 9, 0, 0, 0, time.UTC)
-		if !times[0].Equal(expectedFirst) {
-			t.Errorf("first time = %v, want %v", times[0], expectedFirst)
+		workStart := time.Date(2024, 1, 15, 9, 0, 0, 0, time.UTC)
+		workEnd := time.Date(2024, 1, 15, 18, 0, 0, 0, time.UTC)
+
+		// All reminders should be within work hours (not at boundaries)
+		for i, rt := range times {
+			if rt.Before(workStart) || !rt.Before(workEnd) {
+				t.Errorf("time[%d] = %v is outside work hours [%v, %v)", i, rt, workStart, workEnd)
+			}
 		}
 
-		// Last should be at work end
-		expectedLast := time.Date(2024, 1, 15, 18, 0, 0, 0, time.UTC)
-		if !times[4].Equal(expectedLast) {
-			t.Errorf("last time = %v, want %v", times[4], expectedLast)
+		// First should be after work start (with offset)
+		if !times[0].After(workStart) {
+			t.Errorf("first time %v should be after work start %v", times[0], workStart)
+		}
+
+		// Last should be before work end
+		if !times[4].Before(workEnd) {
+			t.Errorf("last time %v should be before work end %v", times[4], workEnd)
 		}
 	})
 
